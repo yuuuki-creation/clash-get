@@ -55,8 +55,8 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function subscriptionUrl(origin: string, token: string) {
-  return `${origin}/sub/${token}`;
+export function subscriptionUrl(baseUrl: string, token: string) {
+  return `${baseUrl}/sub/${token}`;
 }
 
 export function clashImportUrl(url: string, name: string) {

@@ -50,7 +50,7 @@ export function PasswordModal({ isOpen, onOpenChange }: Props) {
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="sm">
         <Modal.Dialog>
-          <Modal.CloseTrigger />
+          <Modal.CloseTrigger aria-label="关闭" />
           <Modal.Header>
             <Modal.Heading>修改密码</Modal.Heading>
           </Modal.Header>

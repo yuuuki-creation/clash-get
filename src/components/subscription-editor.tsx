@@ -125,7 +125,7 @@ export function SubscriptionEditor({ isOpen, onOpenChange, editing, onSaved }: P
     <Modal.Backdrop isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container scroll="inside" size="lg">
         <Modal.Dialog className="max-w-3xl">
-          <Modal.CloseTrigger />
+          <Modal.CloseTrigger aria-label="关闭" />
           <Modal.Header>
             <Modal.Heading>{editingId ? "编辑订阅" : "新建订阅"}</Modal.Heading>
             <p className="mt-1 text-sm text-muted">粘贴 Clash 配置内容，或上传 .yaml 文件</p>

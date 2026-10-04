@@ -31,7 +31,7 @@ export function QrModal({ isOpen, onOpenChange, name, url }: Props) {
     <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container size="sm">
         <Modal.Dialog>
-          <Modal.CloseTrigger />
+          <Modal.CloseTrigger aria-label="关闭" />
           <Modal.Header>
             <Modal.Heading className="truncate pe-8">{name}</Modal.Heading>
             <p className="mt-1 text-sm text-muted">用手机上的 Clash 客户端扫码导入</p>

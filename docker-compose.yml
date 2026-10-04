@@ -1,0 +1,10 @@
+services:
+  clash-get:
+    container_name: clash-get
+    build: .
+    image: clash-get:latest
+    ports:
+      - "56665:56665"
+    volumes:
+      - ./data:/app/data
+    restart: always

@@ -35,10 +35,16 @@ export interface Subscription {
   fetchCount: number;
 }
 
+export interface Settings {
+  /** 订阅链接使用的地址，比如 https://sub.example.com；null 表示跟随浏览器当前地址 */
+  publicUrl: string | null;
+}
+
 interface Database {
   version: 1;
   sessionSecret: string;
   user: User | null;
+  settings?: Settings;
   subscriptions: Subscription[];
 }
 
@@ -105,6 +111,19 @@ export function updatePassword(passwordHash: string): User {
   db.user.sessionVersion += 1;
   save(db);
   return db.user;
+}
+
+// ---------- 设置 ----------
+
+export function getSettings(): Settings {
+  return { publicUrl: null, ...load().settings };
+}
+
+export function updateSettings(patch: Partial<Settings>): Settings {
+  const db = load();
+  db.settings = { publicUrl: null, ...db.settings, ...patch };
+  save(db);
+  return db.settings;
 }
 
 // ---------- 订阅 ----------

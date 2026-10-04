@@ -25,8 +25,8 @@ import type { Subscription } from "@/lib/store";
 
 interface Props {
   subscription: Subscription;
-  /** 浏览器地址栏的 origin，挂载前为空 */
-  origin: string;
+  /** 订阅链接的基础地址（设置里的域名或当前访问地址），挂载前为空 */
+  baseUrl: string;
   onEdit: () => void;
   onShowQr: () => void;
   onResetToken: () => void;
@@ -56,10 +56,10 @@ function IconAction(props: {
   );
 }
 
-export function SubscriptionCard({ subscription: sub, origin, onEdit, onShowQr, onResetToken, onDelete }: Props) {
+export function SubscriptionCard({ subscription: sub, baseUrl, onEdit, onShowQr, onResetToken, onDelete }: Props) {
   const [copied, setCopied] = useState(false);
-  const mounted = origin !== "";
-  const url = mounted ? subscriptionUrl(origin, sub.token) : "";
+  const mounted = baseUrl !== "";
+  const url = mounted ? subscriptionUrl(baseUrl, sub.token) : "";
   const { proxies, providers, groups, rules } = sub.stats;
   const client = shortUserAgent(sub.lastFetchedBy);
 

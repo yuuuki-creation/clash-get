@@ -1,14 +1,15 @@
 "use client";
 
-import { ArrowRightFromSquare, FileText, Key, Plus } from "@gravity-ui/icons";
+import { ArrowRightFromSquare, FileText, Gear, Key, Plus } from "@gravity-ui/icons";
 import { Button, Card, Tooltip, toast } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { api, subscriptionUrl } from "@/lib/client";
-import type { Subscription } from "@/lib/store";
+import type { Settings, Subscription } from "@/lib/store";
 import { ConfirmDialog } from "./confirm-dialog";
 import { Logo } from "./logo";
 import { PasswordModal } from "./password-modal";
 import { QrModal } from "./qr-modal";
+import { SettingsModal } from "./settings-modal";
 import { SubscriptionCard } from "./subscription-card";
 import { SubscriptionEditor } from "./subscription-editor";
 import { ThemeToggle } from "./theme-toggle";
@@ -17,13 +18,18 @@ type PendingAction = { kind: "delete" | "reset"; subscription: Subscription };
 
 export function Dashboard({
   username,
+  initialSettings,
   initialSubscriptions,
 }: {
   username: string;
+  initialSettings: Settings;
   initialSubscriptions: Subscription[];
 }) {
   const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
+  const [settings, setSettings] = useState(initialSettings);
   const [origin, setOrigin] = useState("");
+  // 挂载前为空，卡片里的时间也靠它判断是否已挂载，避免服务端和浏览器时区不同导致水合不一致
+  const baseUrl = origin ? settings.publicUrl || origin : "";
 
   // 弹窗的目标在关闭后保留，避免退出动画期间内容闪空
   const [editorOpen, setEditorOpen] = useState(false);
@@ -33,6 +39,7 @@ export function Dashboard({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -98,6 +105,12 @@ export function Dashboard({
             <span className="me-2 hidden text-sm text-muted sm:inline">{username}</span>
             <ThemeToggle />
             <Tooltip delay={300}>
+              <Button isIconOnly aria-label="订阅链接地址" size="sm" variant="ghost" onPress={() => setSettingsOpen(true)}>
+                <Gear />
+              </Button>
+              <Tooltip.Content>订阅链接地址</Tooltip.Content>
+            </Tooltip>
+            <Tooltip delay={300}>
               <Button isIconOnly aria-label="修改密码" size="sm" variant="ghost" onPress={() => setPasswordOpen(true)}>
                 <Key />
               </Button>
@@ -117,7 +130,18 @@ export function Dashboard({
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold">我的订阅</h1>
-            <p className="mt-1 text-sm text-muted">每个订阅都有独立链接，复制后在 Clash 中导入即可</p>
+            <p className="mt-1 text-sm text-muted">
+              链接地址：
+              <span className="font-mono text-foreground">{baseUrl || "…"}</span>
+              {origin && !settings.publicUrl && "（跟随当前访问地址）"}
+              <button
+                className="ms-2 cursor-pointer text-accent hover:underline"
+                type="button"
+                onClick={() => setSettingsOpen(true)}
+              >
+                修改
+              </button>
+            </p>
           </div>
           <Button onPress={() => openEditor(null)}>
             <Plus />
@@ -144,7 +168,7 @@ export function Dashboard({
             {subscriptions.map((subscription) => (
               <SubscriptionCard
                 key={subscription.id}
-                origin={origin}
+                baseUrl={baseUrl}
                 subscription={subscription}
                 onDelete={() => ask("delete", subscription)}
                 onEdit={() => openEditor(subscription)}
@@ -172,7 +196,7 @@ export function Dashboard({
       <QrModal
         isOpen={qrOpen}
         name={qrTarget?.name ?? ""}
-        url={qrTarget && origin ? subscriptionUrl(origin, qrTarget.token) : ""}
+        url={qrTarget && baseUrl ? subscriptionUrl(baseUrl, qrTarget.token) : ""}
         onOpenChange={setQrOpen}
       />
 
@@ -191,6 +215,14 @@ export function Dashboard({
       />
 
       <PasswordModal isOpen={passwordOpen} onOpenChange={setPasswordOpen} />
+
+      <SettingsModal
+        isOpen={settingsOpen}
+        origin={origin}
+        settings={settings}
+        onOpenChange={setSettingsOpen}
+        onSaved={setSettings}
+      />
     </div>
   );
 }
